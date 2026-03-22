@@ -1,40 +1,11 @@
 import Layout from "@/components/Layout";
 import FadeIn from "@/components/FadeIn";
-import { BookOpen, Pen, Search, FileText, Globe, CheckCircle } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { BookOpen, Pen, Search, FileText, Globe } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useServices, useSiteContent } from "@/hooks/useSiteContent";
+import type { LucideIcon } from "lucide-react";
 
-const services = [
-  {
-    icon: BookOpen,
-    title: "Literary Translation",
-    description: "Full-length and excerpt translations of novels, short fiction, poetry, and essays. I work closely with authors and publishers to honor the original voice while crafting a text that reads beautifully in English.",
-  },
-  {
-    icon: Pen,
-    title: "Editing & Proofreading",
-    description: "Line editing, copyediting, and proofreading for manuscripts, translations, and literary texts. Careful, sensitive editing that respects the writer's style.",
-  },
-  {
-    icon: Search,
-    title: "Manuscript Review",
-    description: "Detailed feedback on manuscripts-in-progress, translation samples, or proposals. Honest, constructive assessment grounded in editorial experience.",
-  },
-  {
-    icon: FileText,
-    title: "Cultural & Literary Localization",
-    description: "Adapting texts for new cultural contexts with attention to nuance, tone, and readership. Ideal for publishers, cultural institutions, and arts organizations.",
-  },
-  {
-    icon: Globe,
-    title: "Publishing Consultation",
-    description: "Guidance on translation rights, editorial processes, and navigating the international literary landscape. Available for independent authors and small presses.",
-  },
-];
+const iconMap: Record<string, LucideIcon> = { BookOpen, Pen, Search, FileText, Globe };
 
 const processSteps = [
   { step: "01", title: "Inquiry", description: "Reach out with details about your project, timeline, and goals." },
@@ -44,53 +15,43 @@ const processSteps = [
 ];
 
 const faqs = [
-  {
-    question: "What languages do you translate from?",
-    answer: "I translate primarily from Spanish, French, Italian, Hungarian, and Portuguese into English. For other language pairs, I'm happy to discuss possibilities or refer you to a trusted colleague.",
-  },
-  {
-    question: "How do you price your work?",
-    answer: "Pricing depends on the type of project, length, complexity, and timeline. I provide a detailed quote after reviewing the source material. I'm transparent about costs and happy to work within various budget frameworks.",
-  },
-  {
-    question: "Do you work with self-published authors?",
-    answer: "Yes. I work with independent authors, small presses, literary journals, and cultural organizations of all sizes. Every project receives the same level of attention and care.",
-  },
-  {
-    question: "What is your typical turnaround time?",
-    answer: "This varies by project scope. A short story translation might take two to four weeks; a full-length novel, several months. I always discuss timelines upfront and honor agreed deadlines.",
-  },
+  { question: "What languages do you translate from?", answer: "I translate primarily from Spanish, French, Italian, Hungarian, and Portuguese into English." },
+  { question: "How do you price your work?", answer: "Pricing depends on the type of project, length, complexity, and timeline. I provide a detailed quote after reviewing the source material." },
+  { question: "Do you work with self-published authors?", answer: "Yes. I work with independent authors, small presses, literary journals, and cultural organizations of all sizes." },
+  { question: "What is your typical turnaround time?", answer: "This varies by project scope. A short story translation might take two to four weeks; a full-length novel, several months." },
 ];
 
 const Services = () => {
+  const { data: services } = useServices();
+  const { data: content } = useSiteContent();
+
   return (
     <Layout>
       <section className="py-20">
         <div className="container mx-auto px-6 lg:px-8">
           <FadeIn>
             <p className="font-body text-sm uppercase tracking-[0.2em] text-muted-foreground mb-4">Services</p>
-            <h1 className="font-heading text-4xl md:text-5xl font-medium text-foreground mb-6">
-              How I Can Help
-            </h1>
+            <h1 className="font-heading text-4xl md:text-5xl font-medium text-foreground mb-6">How I Can Help</h1>
             <p className="font-body text-base text-muted-foreground leading-relaxed max-w-2xl mb-14">
-              I offer a range of literary and editorial services, each grounded in close attention to language and a deep respect for the texts I work with.
+              {content?.services_intro || "I offer a range of literary and editorial services."}
             </p>
           </FadeIn>
 
-          {/* Service Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-            {services.map((service, i) => (
-              <FadeIn key={service.title} delay={i * 0.08}>
-                <div className="p-8 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors duration-300 h-full">
-                  <service.icon size={26} className="text-primary mb-4" />
-                  <h3 className="font-heading text-lg font-semibold text-foreground mb-3">{service.title}</h3>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed">{service.description}</p>
-                </div>
-              </FadeIn>
-            ))}
+            {services?.map((service, i) => {
+              const Icon = iconMap[service.icon] || BookOpen;
+              return (
+                <FadeIn key={service.id} delay={i * 0.08}>
+                  <div className="p-8 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors duration-300 h-full">
+                    <Icon size={26} className="text-primary mb-4" />
+                    <h3 className="font-heading text-lg font-semibold text-foreground mb-3">{service.title}</h3>
+                    <p className="font-body text-sm text-muted-foreground leading-relaxed">{service.description}</p>
+                  </div>
+                </FadeIn>
+              );
+            })}
           </div>
 
-          {/* Process */}
           <FadeIn>
             <h2 className="font-heading text-3xl font-medium text-foreground mb-10 text-center">Process</h2>
           </FadeIn>
@@ -106,21 +67,14 @@ const Services = () => {
             ))}
           </div>
 
-          {/* FAQ */}
           <FadeIn>
             <div className="max-w-2xl mx-auto">
-              <h2 className="font-heading text-3xl font-medium text-foreground mb-8 text-center">
-                Frequently Asked Questions
-              </h2>
+              <h2 className="font-heading text-3xl font-medium text-foreground mb-8 text-center">Frequently Asked Questions</h2>
               <Accordion type="single" collapsible className="w-full">
                 {faqs.map((faq, i) => (
                   <AccordionItem key={i} value={`faq-${i}`}>
-                    <AccordionTrigger className="font-heading text-base font-medium text-foreground text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="font-body text-sm text-muted-foreground leading-relaxed">
-                      {faq.answer}
-                    </AccordionContent>
+                    <AccordionTrigger className="font-heading text-base font-medium text-foreground text-left">{faq.question}</AccordionTrigger>
+                    <AccordionContent className="font-body text-sm text-muted-foreground leading-relaxed">{faq.answer}</AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
