@@ -51,10 +51,16 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border text-center">
+        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="font-body text-xs text-muted-foreground">
             © {new Date().getFullYear()} Daria. All rights reserved.
           </p>
+          <Link
+            to="/login"
+            className="font-body text-xs text-muted-foreground/40 hover:text-muted-foreground transition-colors duration-200"
+          >
+            Admin
+          </Link>
         </div>
       </div>
     </footer>
