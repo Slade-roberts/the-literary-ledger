@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Pen, Languages } from "lucide-react";
 import Layout from "@/components/Layout";
 import FadeIn from "@/components/FadeIn";
 import { Button } from "@/components/ui/button";
+import { useSiteContent, useWorks, useTestimonials } from "@/hooks/useSiteContent";
 
 const highlights = [
   {
@@ -22,14 +23,14 @@ const highlights = [
   },
 ];
 
-const selectedWorks = [
-  { title: "The Garden of Forking Paths", type: "Translation", lang: "Spanish → English", year: "2024" },
-  { title: "On Silence and Snow", type: "Essay", lang: "", year: "2023" },
-  { title: "Collected Poems of M. Varga", type: "Translation", lang: "Hungarian → English", year: "2023" },
-  { title: "Reading Between Borders", type: "Criticism", lang: "", year: "2022" },
-];
-
 const Index = () => {
+  const { data: content } = useSiteContent();
+  const { data: works } = useWorks();
+  const { data: testimonials } = useTestimonials();
+
+  const selectedWorks = works?.slice(0, 4) || [];
+  const testimonial = testimonials?.[0];
+
   return (
     <Layout>
       {/* Hero */}
@@ -38,17 +39,17 @@ const Index = () => {
           <div className="max-w-2xl">
             <FadeIn>
               <p className="font-body text-sm uppercase tracking-[0.2em] text-muted-foreground mb-4">
-                Literature & Translation
+                {content?.hero_subtitle || "Literature & Translation"}
               </p>
             </FadeIn>
             <FadeIn delay={0.1}>
               <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-medium leading-[1.1] text-foreground mb-6">
-                Daria
+                {content?.hero_title || "Daria"}
               </h1>
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="font-body text-lg md:text-xl text-muted-foreground leading-relaxed mb-8 max-w-lg">
-                Translator, writer, and editor working at the intersection of languages and literature — bringing texts to life with precision, care, and a deep respect for the original voice.
+                {content?.hero_description || "Translator, writer, and editor working at the intersection of languages and literature."}
               </p>
             </FadeIn>
             <FadeIn delay={0.3}>
@@ -102,7 +103,7 @@ const Index = () => {
           </FadeIn>
           <div className="space-y-0 border-t border-border">
             {selectedWorks.map((work, i) => (
-              <FadeIn key={work.title} delay={i * 0.05}>
+              <FadeIn key={work.id} delay={i * 0.05}>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between py-5 border-b border-border hover:bg-card/50 transition-colors duration-200 px-2 -mx-2 rounded">
                   <div className="flex-1">
                     <h3 className="font-heading text-lg font-medium text-foreground">{work.title}</h3>
@@ -126,18 +127,20 @@ const Index = () => {
       </section>
 
       {/* Testimonial */}
-      <section className="py-20 bg-card">
-        <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center">
-          <FadeIn>
-            <blockquote className="font-heading text-2xl md:text-3xl italic font-normal text-foreground leading-relaxed mb-6">
-              "Daria's translations are remarkable — faithful to the original yet entirely alive in the new language. Her literary sensibility is rare and invaluable."
-            </blockquote>
-            <cite className="font-body text-sm text-muted-foreground not-italic">
-              — Elena Voss, Editor at Meridian Press
-            </cite>
-          </FadeIn>
-        </div>
-      </section>
+      {testimonial && (
+        <section className="py-20 bg-card">
+          <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center">
+            <FadeIn>
+              <blockquote className="font-heading text-2xl md:text-3xl italic font-normal text-foreground leading-relaxed mb-6">
+                "{testimonial.quote}"
+              </blockquote>
+              <cite className="font-body text-sm text-muted-foreground not-italic">
+                — {testimonial.author}{testimonial.title ? `, ${testimonial.title}` : ""}
+              </cite>
+            </FadeIn>
+          </div>
+        </section>
+      )}
     </Layout>
   );
 };
