@@ -21,7 +21,17 @@ const contentFields = [
   { key: "contact_email", label: "Contact Email", type: "input" },
 ];
 
-const AdminContent = () => {
+const aboutFields = [
+  { key: "about_bio_1", label: "About Bio (Paragraph 1)", type: "textarea" },
+  { key: "about_bio_2", label: "About Bio (Paragraph 2)", type: "textarea" },
+  { key: "about_bio_3", label: "About Bio (Paragraph 3)", type: "textarea" },
+  { key: "about_approach", label: "About — Approach", type: "textarea" },
+  { key: "about_languages", label: "Languages (comma-separated)", type: "input" },
+  { key: "about_expertise", label: "Expertise (comma-separated)", type: "input" },
+];
+
+const AdminContent = ({ aboutOnly = false }: { aboutOnly?: boolean }) => {
+  const fields = aboutOnly ? aboutFields : contentFields;
   const { data: content, isLoading } = useSiteContent();
   const mutation = useUpdateSiteContent();
   const { toast } = useToast();
@@ -44,7 +54,7 @@ const AdminContent = () => {
 
   return (
     <div className="space-y-6">
-      {contentFields.map((field) => (
+      {fields.map((field) => (
         <div key={field.key} className="space-y-2">
           <Label className="font-body text-sm font-medium">{field.label}</Label>
           {field.type === "textarea" ? (
