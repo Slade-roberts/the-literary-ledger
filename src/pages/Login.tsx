@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,11 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (!loading && (isAdmin || isEditor)) {
-    navigate("/admin", { replace: true });
-  }
+  useEffect(() => {
+    if (!loading && (isAdmin || isEditor)) {
+      navigate("/admin", { replace: true });
+    }
+  }, [loading, isAdmin, isEditor, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +28,21 @@ const Login = () => {
     setSubmitting(false);
     if (error) {
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
-      navigate("/admin");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/")}
+          className="font-body gap-2 mb-6 -ml-2 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft size={16} />
+          Back to Home
+        </Button>
         <h1 className="font-heading text-3xl font-medium text-foreground mb-8 text-center">Admin Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
