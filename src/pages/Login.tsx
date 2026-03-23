@@ -7,14 +7,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const { signIn, isAdmin, loading } = useAuth();
+  const { signIn, isAdmin, isEditor, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  if (!loading && isAdmin) {
+  if (!loading && (isAdmin || isEditor)) {
     navigate("/admin", { replace: true });
   }
 
