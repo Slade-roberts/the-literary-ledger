@@ -8,7 +8,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isEditor: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null; hasAccess: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -21,15 +21,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isEditor, setIsEditor] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const checkRoles = async (userId: string) => {
+  const checkRoles = async (userId: string): Promise<{ isAdmin: boolean; isEditor: boolean }> => {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
-    if (error) return;
+    if (error) return { isAdmin: false, isEditor: false };
     const roles = data?.map((r) => r.role) ?? [];
-    setIsAdmin(roles.includes("admin"));
-    setIsEditor(roles.includes("editor"));
+    const admin = roles.includes("admin");
+    const editor = roles.includes("editor");
+    setIsAdmin(admin);
+    setIsEditor(editor);
+    return { isAdmin: admin, isEditor: editor };
   };
 
   useEffect(() => {
@@ -60,8 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { error: error as Error | null, hasAccess: false };
+    let hasAccess = false;
+    if (data.user) {
+      const roles = await checkRoles(data.user.id);
+      hasAccess = roles.isAdmin || roles.isEditor;
+    }
+    return { error: null, hasAccess };
   };
 
   const signOut = async () => {

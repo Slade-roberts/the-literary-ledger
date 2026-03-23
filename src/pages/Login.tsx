@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const { signIn, isAdmin, isEditor, loading } = useAuth();
+  const { signIn, signOut, isAdmin, isEditor, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -24,11 +24,18 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const { error } = await signIn(email, password);
-    setSubmitting(false);
+    const { error, hasAccess } = await signIn(email, password);
     if (error) {
+      setSubmitting(false);
       toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      return;
     }
+    if (!hasAccess) {
+      setSubmitting(false);
+      await signOut();
+      toast({ title: "Access denied", description: "Your account doesn't have permission to access this panel.", variant: "destructive" });
+    }
+    // On success with access, keep submitting=true; the useEffect redirect will navigate away
   };
 
   return (
