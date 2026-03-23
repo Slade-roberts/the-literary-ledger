@@ -22,10 +22,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const checkRoles = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId);
+    if (error) return;
     const roles = data?.map((r) => r.role) ?? [];
     setIsAdmin(roles.includes("admin"));
     setIsEditor(roles.includes("editor"));
